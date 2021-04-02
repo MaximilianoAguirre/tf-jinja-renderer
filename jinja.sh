@@ -3,7 +3,7 @@
 set -e
 
 # Parse input
-eval "$(jq -r '@sh "W=\(.working_directory) T=\(.jinja_template) filters=\(.filters) module_directory=\(.module_directory) data=\(.data)"')"
+eval "$(jq -r '@sh "jinja_template=\(.jinja_template) filters=\(.filters) module_directory=\(.module_directory) data=\(.data)"')"
 
 # Function to evaluate if  docker engine is installed and running
 # If the condition is not met exit with failure
@@ -26,16 +26,33 @@ check_docker_image () {
 check_docker_engine
 check_docker_image "jinja" "latest" "$module_directory/jinja"
 
+# Save template to temporal file
+echo $jinja_template > template.tmp
+echo $data > data.json
+
 # Create args to run jinja
 args=()
 
 # Check if filters have been submitted and add an argument if so
 if [[ $(echo $filters | jq length) -ne 0 ]]; then
+    echo $filters |
+    jq -r '.[]' |
+    awk -F "\\" '{print "touch filter"NR-1".py && echo \""$1"\" >> filter"NR-1".py"}' |
+    xargs -0 bash -c
+
+    # to_entries | map("filter\(.key).py") | join(" ")
+
     args+=(--filters $(echo $filters | jq -r '. | join(" ")'))
 fi
 
 # Run jinja
-RESULT=$(docker run --rm -v $W:/app jinja $T $data "${args[@]}")
+# RESULT=$(docker run -v $module_directory:/app --rm jinja template.tmp data.json "${args[@]}")
+RESULT=$(docker run -v $module_directory:/app --rm jinja template.tmp data.json)
+
+# Remove temporal file
+rm template.tmp
+rm data.json
+rm *.py
 
 # Parse output
 jq -n \

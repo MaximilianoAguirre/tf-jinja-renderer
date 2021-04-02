@@ -1,8 +1,3 @@
-variable "working_directory" {
-  description = "Directory containing templates and filters"
-  type        = string
-}
-
 variable "jinja_template" {
   description = "File to render"
   type        = string
