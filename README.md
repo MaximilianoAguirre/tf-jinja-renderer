@@ -28,6 +28,8 @@ module "jinja" {
 | `terraform` | ~> 0.13.4 |
 | `external`  | ~> 1.2    |
 
+In addition to terraform and providers, this modules requires [`jq`](https://stedolan.github.io/jq/) and [`docker`](https://www.docker.com/) to be installed (and running in the case of docker).
+
 ## Inputs
 
 | Name             | Description                                | Type         | Default        | Required |
