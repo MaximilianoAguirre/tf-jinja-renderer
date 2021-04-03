@@ -6,5 +6,6 @@ data "external" "jinja_renderer" {
     data              = var.data
     filters           = jsonencode(var.filters)
     module_directory  = abspath(path.module)
+    docker_tag        = var.docker_tag
   }
 }

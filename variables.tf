@@ -13,3 +13,9 @@ variable "filters" {
   type        = list(string)
   default     = []
 }
+
+variable "docker_tag" {
+  description = "Tag used for the docker image required."
+  type        = string
+  default     = "jinja:latest"
+}

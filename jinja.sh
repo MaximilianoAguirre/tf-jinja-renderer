@@ -3,7 +3,7 @@
 set -e
 
 # Parse input
-eval "$(jq -r '@sh "jinja_template=\(.jinja_template) filters=\(.filters) module_directory=\(.module_directory) data=\(.data)"')"
+eval "$(jq -r '@sh "jinja_template=\(.jinja_template) filters=\(.filters) module_directory=\(.module_directory) docker_tag=\(.docker_tag) data=\(.data)"')"
 
 # Function to evaluate if  docker engine is installed and running
 # If the condition is not met exit with failure
@@ -16,15 +16,15 @@ check_docker_engine () {
 
 # Function to check if a docker image is built, if not, build process is executed
 check_docker_image () {
-    image=$(docker images --filter "reference=$1:$2" -q)
+    image=$(docker images --filter "reference=$1" -q)
     if [ -z "$image" ]; then
-        docker build -t $1:$2 $3 -q >/dev/null
+        docker build -t $1 $2 -q >/dev/null
     fi
 }
 
 # Check dependencies
 check_docker_engine
-check_docker_image "jinja" "latest" "$module_directory/jinja"
+check_docker_image $docker_tag "$module_directory/jinja"
 
 # Declare used variables
 jinja_template_filename=$(basename $jinja_template)
