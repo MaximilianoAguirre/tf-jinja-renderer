@@ -29,6 +29,4 @@ override.tf.json
 # example: *tfplan*
 
 # App specific tmp files
-data.json
-template.tmp
-*.py
+tmp/

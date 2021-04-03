@@ -26,35 +26,32 @@ check_docker_image () {
 check_docker_engine
 check_docker_image "jinja" "latest" "$module_directory/jinja"
 
-# Save template to temporal file
-echo $jinja_template > template.tmp
-echo $data > data.json
+# Declare used variables
+jinja_template_filename=$(basename $jinja_template)
+data_filename=$(basename $data)
+
+# Copy files to tmp folder
+mkdir -p $module_directory/tmp
+cp $jinja_template $module_directory/tmp
+cp $data $module_directory/tmp
 
 # Create args to run jinja
 args=()
 
 # Check if filters have been submitted and add an argument if so
 if [[ $(echo $filters | jq length) -ne 0 ]]; then
-    echo $filters |
-    jq -r '.[]' |
-    awk -F "\\" '{print "touch filter"NR-1".py && echo \""$1"\" >> filter"NR-1".py"}' |
-    xargs -0 bash -c
+    echo $filters | jq -r '.[]' | awk -v module_directory=$module_directory '{print "cp "$0" "module_directory"/tmp/"}' | xargs -0 bash -c
 
-    # to_entries | map("filter\(.key).py") | join(" ")
-
-    args+=(--filters $(echo $filters | jq -r '. | join(" ")'))
+    args+=(--filters $(echo $filters | jq -r '.[]' | xargs -L1 basename | paste -sd " " -))
 fi
 
 # Run jinja
-# RESULT=$(docker run -v $module_directory:/app --rm jinja template.tmp data.json "${args[@]}")
-RESULT=$(docker run -v $module_directory:/app --rm jinja template.tmp data.json)
+RESULT=$(docker run -v $module_directory/tmp:/app --rm jinja $jinja_template_filename $data_filename "${args[@]}")
 
-# Remove temporal file
-rm template.tmp
-rm data.json
-rm *.py
+# Remove temporal files
+rm -rf $module_directory/tmp/
 
 # Parse output
 jq -n \
 --arg r "$RESULT" \
-'{ "result": $r }'
+'{ "rendered_template": $r }'
