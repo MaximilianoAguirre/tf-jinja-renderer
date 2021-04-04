@@ -3,7 +3,7 @@
 set -e
 
 # Parse input
-eval "$(jq -r '@sh "jinja_template=\(.jinja_template) filters=\(.filters) module_directory=\(.module_directory) docker_tag=\(.docker_tag) data=\(.data)"')"
+eval "$(jq -r '@sh "jinja_template=\(.jinja_template) filters=\(.filters) module_directory=\(.module_directory) docker_tag=\(.docker_tag) data=\(.data) allow_undefined=\(.allow_undefined) data_format=\(.data_format)"')"
 
 # Function to evaluate if  docker engine is installed and running
 # If the condition is not met exit with failure
@@ -28,14 +28,23 @@ check_docker_image $docker_tag "$module_directory/jinja"
 
 # Declare used variables
 tmp=$module_directory/tmp
+data_file=data.$data_format
 
 # Save template and data in files
 mkdir -p $tmp
-echo "$jinja_template" > $tmp/template.yaml
-echo "$data" > $tmp/data.json
+echo "$jinja_template" > $tmp/template
+echo "$data" > $tmp/$data_file
 
 # Create args to run jinja
 args=()
+
+# Add format flag
+args+=(--format $data_format)
+
+# Set undefined flag if allow_undefined is true
+if [ "$allow_undefined" == "true" ]; then
+    args+=(--undefined)
+fi
 
 # Check if filters have been submitted and add an argument if so
 if [[ $(echo $filters | jq length) -ne 0 ]]; then
@@ -45,7 +54,7 @@ if [[ $(echo $filters | jq length) -ne 0 ]]; then
 fi
 
 # Run jinja
-RESULT=$(docker run -v $module_directory/tmp:/app --rm jinja template.yaml data.json "${args[@]}")
+RESULT=$(docker run -v $module_directory/tmp:/app --rm jinja template $data_file "${args[@]}")
 
 # Remove temporal files
 rm -rf $tmp
