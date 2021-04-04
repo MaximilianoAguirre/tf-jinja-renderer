@@ -27,13 +27,12 @@ check_docker_engine
 check_docker_image $docker_tag "$module_directory/jinja"
 
 # Declare used variables
-jinja_template_filename=$(basename $jinja_template)
-data_filename=$(basename $data)
+tmp=$module_directory/tmp
 
-# Copy files to tmp folder
-mkdir -p $module_directory/tmp
-cp $jinja_template $module_directory/tmp
-cp $data $module_directory/tmp
+# Save template and data in files
+mkdir -p $tmp
+echo "$jinja_template" > $tmp/template.yaml
+echo "$data" > $tmp/data.json
 
 # Create args to run jinja
 args=()
@@ -46,10 +45,10 @@ if [[ $(echo $filters | jq length) -ne 0 ]]; then
 fi
 
 # Run jinja
-RESULT=$(docker run -v $module_directory/tmp:/app --rm jinja $jinja_template_filename $data_filename "${args[@]}")
+RESULT=$(docker run -v $module_directory/tmp:/app --rm jinja template.yaml data.json "${args[@]}")
 
 # Remove temporal files
-rm -rf $module_directory/tmp/
+rm -rf $tmp
 
 # Parse output
 jq -n \
