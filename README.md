@@ -9,11 +9,27 @@ Terraform 0.13 and newer
 ## Usage
 
 ```hcl
-module "jinja" {
-    source =
+module "tf-jinja-renderer" {
+  source = "github.com/MaximilianoAguirre/tf-jinja-renderer"
 
-    jinja_template = "${path.module}/jinja_template.yaml"
-    data           = "${path.module}/data.json"
+  jinja_template = <<EOF
+    server {
+      listen 80;
+      server_name {{ nginx.hostname }};
+
+      root {{ nginx.webroot }};
+      index index.htm;
+    }
+    EOF
+
+  data = <<EOF
+    {
+        "nginx":{
+            "hostname": "localhost",
+            "webroot": "/var/www/project"
+        }
+    }
+    EOF
 
   filters = [
     "${path.module}/filters.py"
