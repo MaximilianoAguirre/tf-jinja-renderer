@@ -48,14 +48,15 @@ In addition to terraform and providers, this modules requires [`jq`](https://ste
 
 ## Inputs
 
-| Name              | Description                                | Type         | Default                    | Required |
-| ----------------- | ------------------------------------------ | ------------ | -------------------------- | :------: |
-| `jinja_template`  | Path to the jinja template file            | string       | -                          |  `yes`   |
-| `data`            | Path to data file                          | string       | -                          |  `yes`   |
-| `filters`         | List of paths filters files (.py)          | list(string) | []                         |   `no`   |
-| `allow_undefined` | Allow undefined values in jinja            | bool         | false                      |   `no`   |
-| `data_format`     | Data format                                | string       | "json"                     |   `no`   |
-| `docker_tag`      | Tag to apply to docker image running jinja | string       | "tf-jinja-renderer:latest" |   `no`   |
+| Name                    | Description                                | Type         | Default                                    | Required |
+| ----------------------- | ------------------------------------------ | ------------ | ------------------------------------------ | :------: |
+| `jinja_template`        | Path to the jinja template file            | string       | -                                          |  `yes`   |
+| `data`                  | Path to data file                          | string       | -                                          |  `yes`   |
+| `filters`               | List of paths to filters files (.py)       | list(string) | []                                         |   `no`   |
+| `allow_undefined`       | Allow undefined values in jinja            | bool         | false                                      |   `no`   |
+| `data_format`           | Data format                                | string       | "json"                                     |   `no`   |
+| `docker_tag`            | Tag to apply to docker image running jinja | string       | "maximilianoaguirre/tf-jinja-renderer:1.0" |   `no`   |
+| `docker_container_name` | Prefix used for the docker container       | string       | "tf-jinja-renderer"                        |   `no`   |
 
 ## Outputs
 

@@ -40,8 +40,14 @@ variable "data_format" {
 ###################################################################
 # Docker options
 ###################################################################
-variable "docker_tag" {
+variable "docker_image_tag" {
   description = "Tag used for the docker image required."
   type        = string
-  default     = "tf-jinja-renderer:latest"
+  default     = "maximilianoaguirre/tf-jinja-renderer:1.0"
+}
+
+variable "docker_container_name" {
+  description = "Name used for the docker container (prefix)."
+  type        = string
+  default     = "tf-jinja-renderer"
 }
