@@ -47,3 +47,11 @@ resource "docker_container" "jinja_renderer" {
     }
   }
 }
+
+data "external" "container_outputs" {
+  program = ["sh", "${path.module}/data_external/get_container_logs.sh"]
+
+  query = {
+    container = docker_container.jinja_renderer.name
+  }
+}

@@ -1,4 +1,4 @@
 output "rendered_template" {
-  value       = docker_container.jinja_renderer.container_logs
+  value       = data.external.container_outputs.result.rendered_template
   description = "Rendered template"
 }
